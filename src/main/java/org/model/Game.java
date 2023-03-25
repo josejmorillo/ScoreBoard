@@ -55,4 +55,9 @@ public class Game {
         this.awayTeamScore = awayTeamScore;
     }
 
+    public void updateScore(int homeTeamScore, int awayTeamScore){
+        this.homeTeamScore = homeTeamScore;
+        this.awayTeamScore = awayTeamScore;
+    }
+
 }
