@@ -1,26 +1,16 @@
 package org.model;
 
 public class Game {
-    private int id = 0;
     private String homeTeam;
     private String awayTeam;
     private int homeTeamScore;
     private int awayTeamScore;
 
     public Game(String homeTeam, String awayTeam) {
-        id++;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.homeTeamScore = 0;
         this.awayTeamScore = 0;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getHomeTeam() {
@@ -55,9 +45,31 @@ public class Game {
         this.awayTeamScore = awayTeamScore;
     }
 
+    public int getTotalScore() {
+        return homeTeamScore + awayTeamScore;
+    }
+
     public void updateScore(int homeTeamScore, int awayTeamScore){
         this.homeTeamScore = homeTeamScore;
         this.awayTeamScore = awayTeamScore;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Game other = (Game) o;
+        return homeTeam.equalsIgnoreCase(other.homeTeam) && awayTeam.equalsIgnoreCase(other.awayTeam);
+    }
+
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "homeTeam='" + homeTeam + '\'' +
+                ", awayTeam='" + awayTeam + '\'' +
+                ", homeTeamScore=" + homeTeamScore +
+                ", awayTeamScore=" + awayTeamScore +
+                '}';
+    }
 }
