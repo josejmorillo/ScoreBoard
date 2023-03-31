@@ -1,13 +1,11 @@
 package org.controller;
 
-/**
- * Hello world!
- *
- */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+import org.view.ScoreBoardView;
+
+public class App {
+
+    public static void main(String[] args) {
+        ScoreBoardController controller = new ScoreBoardController();
+        ScoreBoardView view = new ScoreBoardView(controller);
     }
 }

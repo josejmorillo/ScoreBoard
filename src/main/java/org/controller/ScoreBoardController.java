@@ -7,9 +7,11 @@ import java.util.List;
 
 public class ScoreBoardController {
     List<Game> games;
+    List<Game> finishedGames;
 
     public ScoreBoardController() {
         this.games = new ArrayList<>();
+        this.finishedGames = new ArrayList<>();
     }
 
     public void startGame (String homeTeam, String awayTeam) {
@@ -22,17 +24,14 @@ public class ScoreBoardController {
     }
 
     public boolean finishGame (String homeTeam, String awayTeam) {
-        Game gameToRemove = findGame(homeTeam, awayTeam);
-        if (gameToRemove != null) {
-            return games.remove(gameToRemove);
+        Game gameFinished = findGame(homeTeam, awayTeam);
+        if (gameFinished != null) {
+            finishedGames.add(gameFinished);
+            return games.remove(gameFinished);
         } else {
             System.out.println("Game not found.");
             return false;
         }
-    }
-
-    public boolean finishGame (Game game) {
-       return finishGame(game.getHomeTeam(), game.getAwayTeam());
     }
 
     public Game findGame(String homeTeam, String awayTeam) {
@@ -49,10 +48,6 @@ public class ScoreBoardController {
         } else {
             System.out.println("Game not found.");
         }
-    }
-
-    public void updateScore (Game game, int homeTeamScore, int awayTeamScore) {
-        updateScore (game.getHomeTeam(), game.getAwayTeam(), homeTeamScore, awayTeamScore);
     }
 
     /**
@@ -74,6 +69,14 @@ public class ScoreBoardController {
         });
 
         return sortedGames;
+    }
+
+    public List<Game> getGames() {
+        return games;
+    }
+
+    public List<Game> getFinishedGames() {
+        return finishedGames;
     }
 
 }
