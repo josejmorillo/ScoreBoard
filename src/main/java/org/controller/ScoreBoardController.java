@@ -58,6 +58,7 @@ public class ScoreBoardController {
      */
     public List <Game> getSummaryByTotalScore() {
         List <Game> sortedGames = new ArrayList<>(games);
+        sortedGames.addAll(finishedGames);
 
         sortedGames.sort((g1,g2) -> {
             int totalScore = g2.getTotalScore() - g1.getTotalScore();

@@ -11,6 +11,8 @@ public class ScoreBoardView extends JFrame {
 
     private final ScoreBoardController controller;
     private JTable gamesTable;
+
+    //Fields
     private JTextField homeTeamField;
     private JTextField awayTeamField;
     private JTextField homeScoreField;
@@ -22,6 +24,13 @@ public class ScoreBoardView extends JFrame {
     private JButton summaryButton;
     private JButton addButton;
 
+    //Labels
+    private JLabel awayTeamLabel;
+    private JLabel homeTeamLabel;
+    private JLabel homeScoreLabel;
+    private JLabel awayScoreLabel;
+    private JScrollPane scrollPane;
+
     public ScoreBoardView(ScoreBoardController controller) {
         this.controller = controller;
         initComponents();
@@ -31,44 +40,9 @@ public class ScoreBoardView extends JFrame {
         setTitle("Scoreboard");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        // create table with model
-        String[] columnNames = {"Home Team", "Away Team", "Home Score", "Away Score"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-
-        gamesTable = new JTable(tableModel);
-
-        // create scroll pane for table
-        JScrollPane scrollPane = new JScrollPane(gamesTable);
-
-        // create labels and text fields for input
-        JLabel homeTeamLabel = new JLabel("Home Team");
-        homeTeamField = new JTextField();
-        JLabel awayTeamLabel = new JLabel("Away Team");
-        awayTeamField = new JTextField();
-
-        JLabel homeScoreLabel = new JLabel("Home Score");
-        homeScoreField = new JTextField();
-        JLabel awayScoreLabel = new JLabel("Away Score");
-        awayScoreField = new JTextField();
-        homeScoreField.setEnabled(false);
-        awayScoreField.setEnabled(false);
-
-        // Buttons
-        addButton = new JButton("Add Game");
-        updateButton = new JButton("Update Score");
-        finishButton = new JButton("Finish Game");
-        summaryButton = new JButton("Games Summary");
-        addBtnListener();
-        updateBtnListener();
-        finishBtnListener();
-        updateButton.setEnabled(false);
-        finishButton.setEnabled(false);
-        summaryButton.setEnabled(false);
-
-
-        //Table selection listener to enable/disable update button
-        ListSelectionModel selectionRow = gamesTable.getSelectionModel();
-        selectionListener(selectionRow);
+        createTable();
+        createLabels();
+        createButtons();
 
         // create panel for input and buttons
         JPanel inputPanel = new JPanel(new GridLayout(3, 4));
@@ -96,12 +70,51 @@ public class ScoreBoardView extends JFrame {
         setVisible(true);
     }
 
+    private void createButtons() {
+        // Buttons
+        addButton = new JButton("Add Game");
+        updateButton = new JButton("Update Score");
+        finishButton = new JButton("Finish Game");
+        summaryButton = new JButton("Games Summary");
+        addBtnListener();
+        updateBtnListener();
+        finishBtnListener();
+        summaryBtnListener();
+    }
+
+    private void createLabels() {
+        // create labels and text fields for input
+        homeTeamLabel = new JLabel("Home Team");
+        homeTeamField = new JTextField();
+        awayTeamLabel = new JLabel("Away Team");
+        awayTeamField = new JTextField();
+        homeScoreLabel = new JLabel("Home Score");
+        homeScoreField = new JTextField();
+        awayScoreLabel = new JLabel("Away Score");
+        awayScoreField = new JTextField();
+    }
+
+    private void createTable() {
+        // create table with model
+        String[] columnNames = {"Home Team", "Score", "Away Team", "Score"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        gamesTable = new JTable(tableModel);
+        // create scroll pane for table
+        scrollPane = new JScrollPane(gamesTable);
+    }
+
+    private void summaryBtnListener() {
+        summaryButton.addActionListener(listener -> {
+            summaryTable();
+        });
+    }
+
     private void finishBtnListener() {
         finishButton.addActionListener(listener -> {
             int selectedRow = gamesTable.getSelectedRow();
             if (selectedRow >= 0) {
                 String homeTeam = (String) gamesTable.getValueAt(selectedRow, 0);
-                String awayTeam = (String) gamesTable.getValueAt(selectedRow, 1);
+                String awayTeam = (String) gamesTable.getValueAt(selectedRow, 2);
                 controller.finishGame(homeTeam, awayTeam);
                 refreshTable();
             } else {
@@ -116,6 +129,7 @@ public class ScoreBoardView extends JFrame {
             String awayTeam = awayTeamField.getText();
             if(!homeTeam.isEmpty() && !awayTeam.isEmpty()) {
                 controller.startGame(homeTeam, awayTeam);
+                resetAddBtn();
                 refreshTable();
             } else {
                 showDialog("Please fill in both team fields");
@@ -123,12 +137,17 @@ public class ScoreBoardView extends JFrame {
         });
     }
 
+    private void resetAddBtn() {
+        homeTeamField.setText("");
+        awayTeamField.setText("");
+    }
+
     private void updateBtnListener() {
         updateButton.addActionListener(listener -> {
             int selectedRow = gamesTable.getSelectedRow();
             if (selectedRow >= 0) {
                 String homeTeam = (String) gamesTable.getValueAt(selectedRow, 0);
-                String awayTeam = (String) gamesTable.getValueAt(selectedRow, 1);
+                String awayTeam = (String) gamesTable.getValueAt(selectedRow, 2);
                 int homeScore;
                 int awayScore;
                 try {
@@ -139,6 +158,7 @@ public class ScoreBoardView extends JFrame {
                     return;
                 }
                 controller.updateScore(homeTeam, awayTeam, homeScore, awayScore);
+                resetUpdateBtn();
                 refreshTable();
             } else {
                 showDialog("Please select a game to update the score");
@@ -146,24 +166,9 @@ public class ScoreBoardView extends JFrame {
         });
     }
 
-    private void selectionListener(ListSelectionModel selectionRow) {
-        selectionRow.addListSelectionListener(listener -> {
-            int selectedRow = gamesTable.getSelectedRow();
-            if (selectedRow >= 0) {
-                updateButton.setEnabled(true);
-                finishButton.setEnabled(true);
-
-                homeScoreField.setEnabled(true);
-                awayScoreField.setEnabled(true);
-
-            } else {
-                updateButton.setEnabled(false);
-                finishButton.setEnabled(false);
-
-                homeScoreField.setEnabled(false);
-                awayScoreField.setEnabled(false);
-            }
-        });
+    private void resetUpdateBtn() {
+        homeScoreField.setText("");
+        awayScoreField.setText("");
     }
 
     private void showDialog(String msg) {
@@ -173,21 +178,17 @@ public class ScoreBoardView extends JFrame {
     private void refreshTable() {
         DefaultTableModel tableModel = (DefaultTableModel) gamesTable.getModel();
         tableModel.setRowCount(0); //clear table
-        for (Game game : controller.getSummaryByTotalScore()) {
-            Object[] row = {game.getHomeTeam(), game.getAwayTeam(), game.getHomeTeamScore(), game.getAwayTeamScore()};
+        for (Game game : controller.getGames()) {
+            Object[] row = {game.getHomeTeam(), game.getHomeTeamScore(), game.getAwayTeam(), game.getAwayTeamScore()};
             tableModel.addRow(row);
         }
     }
 
-    private void enableScoreFields() {
-        DefaultTableModel tableModel = (DefaultTableModel) gamesTable.getModel();
-        tableModel.getRowCount();
-        if (tableModel.getRowCount() > 0 && !homeTeamField.getText().isEmpty() && !awayTeamField.getText().isEmpty()) {
-            homeScoreField.setEnabled(true);
-            awayScoreField.setEnabled(true);
+    private void summaryTable() {
+        if(controller.getSummaryByTotalScore().isEmpty()) {
+            showDialog ("There are no games to show!");
         } else {
-            homeScoreField.setEnabled(false);
-            awayScoreField.setEnabled(false);
+            SummaryBoardView summaryView = new SummaryBoardView(controller);
         }
     }
 
