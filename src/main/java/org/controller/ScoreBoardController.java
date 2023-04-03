@@ -9,10 +9,10 @@ import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class ScoreBoardController {
     List<Game> games;
-    List<Game> finishedGames;
     private ScoreBoardView scoreView;
     private SummaryBoardView summaryView;
     private static final Logger logger = Logger.getLogger(ScoreBoardController.class.getName());
@@ -20,7 +20,6 @@ public class ScoreBoardController {
 
     public ScoreBoardController() {
         this.games = new ArrayList<>();
-        this.finishedGames = new ArrayList<>();
         this.scoreView = new ScoreBoardView();
         addBtnListener();
         updateBtnListener();
@@ -37,14 +36,12 @@ public class ScoreBoardController {
         }
     }
 
-    public boolean finishGame (String homeTeam, String awayTeam) {
+    public void finishGame (String homeTeam, String awayTeam) {
         Game gameFinished = findGame(homeTeam, awayTeam);
         if (gameFinished != null) {
-            finishedGames.add(gameFinished);
-            return games.remove(gameFinished);
+            gameFinished.setFinished(true);
         } else {
             logger.warning("Game not found.");
-            return false;
         }
     }
 
@@ -72,7 +69,6 @@ public class ScoreBoardController {
      */
     public List <Game> getSummaryByTotalScore() {
         List <Game> sortedGames = new ArrayList<>(games);
-        sortedGames.addAll(finishedGames);
 
         sortedGames.sort((g1,g2) -> {
             int totalScore = g2.getTotalScore() - g1.getTotalScore();
@@ -154,7 +150,8 @@ public class ScoreBoardController {
     public void refreshTable() {
         DefaultTableModel tableModel = (DefaultTableModel) scoreView.getGamesTable().getModel();
         tableModel.setRowCount(0); //clear table
-        for (Game game : games) {
+        List <Game> playingGames = games.stream().filter(game -> !game.isFinished()).collect(Collectors.toList());
+        for (Game game : playingGames) {
             Object[] row = {game.getHomeTeam(), game.getHomeTeamScore(), game.getAwayTeam(), game.getAwayTeamScore()};
             tableModel.addRow(row);
         }

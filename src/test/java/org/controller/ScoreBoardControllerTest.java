@@ -36,14 +36,9 @@ class ScoreBoardControllerTest {
     @Test
     void testFinishGame() {
         scoreboard.startGame("HomeTeam", "AwayTeam");
-        boolean result = scoreboard.finishGame("HomeTeam", "AwayTeam");
-        assertTrue(result);
-    }
-
-    @Test
-    void testFinishGameNotFound() {
-        scoreboard.startGame("HomeTeam", "AwayTeam");
-        assertFalse(scoreboard.finishGame("AwayTeam", "HomeTeam"));
+        scoreboard.finishGame("HomeTeam", "AwayTeam");
+        Game game = scoreboard.getSummaryByTotalScore().get(0);
+        assertTrue(game.isFinished());
     }
 
     @Test

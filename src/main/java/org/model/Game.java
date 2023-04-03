@@ -5,12 +5,14 @@ public class Game {
     private String awayTeam;
     private int homeTeamScore;
     private int awayTeamScore;
+    private boolean isFinished;
 
     public Game(String homeTeam, String awayTeam) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.homeTeamScore = 0;
         this.awayTeamScore = 0;
+        this.isFinished = false;
     }
 
     public String getHomeTeam() {
@@ -54,6 +56,14 @@ public class Game {
         this.awayTeamScore = awayTeamScore;
     }
 
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -70,6 +80,7 @@ public class Game {
         return result;
     }
 
+
     @Override
     public String toString() {
         return "Game{" +
@@ -77,6 +88,7 @@ public class Game {
                 ", awayTeam='" + awayTeam + '\'' +
                 ", homeTeamScore=" + homeTeamScore +
                 ", awayTeamScore=" + awayTeamScore +
+                ", isFinished=" + isFinished +
                 '}';
     }
 }
