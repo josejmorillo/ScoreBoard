@@ -1,17 +1,31 @@
 package org.controller;
 
 import org.model.Game;
+import org.view.ScoreBoardView;
+import org.view.SummaryBoardView;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class ScoreBoardController {
     List<Game> games;
     List<Game> finishedGames;
+    private ScoreBoardView scoreView;
+    private SummaryBoardView summaryView;
+    private static final Logger logger = Logger.getLogger(ScoreBoardController.class.getName());
+
 
     public ScoreBoardController() {
         this.games = new ArrayList<>();
         this.finishedGames = new ArrayList<>();
+        this.scoreView = new ScoreBoardView();
+        addBtnListener();
+        updateBtnListener();
+        finishBtnListener();
+        summaryBtnListener();
     }
 
     public void startGame (String homeTeam, String awayTeam) {
@@ -19,7 +33,7 @@ public class ScoreBoardController {
             Game game = new Game(homeTeam, awayTeam);
             games.add(game);
         } else {
-            System.out.println("There is already a game with the same teams.");
+            logger.warning("There is already a game with the same teams.");
         }
     }
 
@@ -29,7 +43,7 @@ public class ScoreBoardController {
             finishedGames.add(gameFinished);
             return games.remove(gameFinished);
         } else {
-            System.out.println("Game not found.");
+            logger.warning("Game not found.");
             return false;
         }
     }
@@ -46,7 +60,7 @@ public class ScoreBoardController {
         if (gameToUpdate != null) {
             gameToUpdate.updateScore(homeTeamScore, awayTeamScore);
         } else {
-            System.out.println("Game not found.");
+            logger.warning("Game not found.");
         }
     }
 
@@ -72,12 +86,88 @@ public class ScoreBoardController {
         return sortedGames;
     }
 
-    public List<Game> getGames() {
-        return games;
+    private void addBtnListener() {
+        scoreView.getAddButton().addActionListener(listener -> {
+            String homeTeam = scoreView.getHomeTeamField().getText();
+            String awayTeam = scoreView.getAwayTeamField().getText();
+            if(!homeTeam.isEmpty() && !awayTeam.isEmpty()) {
+                startGame(homeTeam, awayTeam);
+                scoreView.resetAddBtn();
+                refreshTable();
+            } else {
+                scoreView.showDialog("Please fill in both team fields");
+            }
+        });
     }
 
-    public List<Game> getFinishedGames() {
-        return finishedGames;
+    private void updateBtnListener() {
+        scoreView.getUpdateButton().addActionListener(listener -> {
+            JTable gamesTable = scoreView.getGamesTable();
+            int selectedRow = gamesTable.getSelectedRow();
+            if (selectedRow >= 0) {
+                String homeTeam = (String) gamesTable.getValueAt(selectedRow, 0);
+                String awayTeam = (String) gamesTable.getValueAt(selectedRow, 2);
+                int homeScore;
+                int awayScore;
+                try {
+                    homeScore = Integer.parseInt(scoreView.getHomeScoreField().getText());
+                    awayScore = Integer.parseInt(scoreView.getAwayScoreField().getText());
+                } catch (NumberFormatException e) {
+                    scoreView.showDialog("Please enter valid scores");
+                    return;
+                }
+                updateScore(homeTeam, awayTeam, homeScore, awayScore);
+                scoreView.resetUpdateBtn();
+                refreshTable();
+            } else {
+                scoreView.showDialog("Please select a game to update the score");
+            }
+        });
     }
+
+    private void finishBtnListener() {
+        scoreView.getFinishButton().addActionListener(listener -> {
+            JTable gamesTable = scoreView.getGamesTable();
+            int selectedRow = gamesTable.getSelectedRow();
+            if (selectedRow >= 0) {
+                String homeTeam = (String) gamesTable.getValueAt(selectedRow, 0);
+                String awayTeam = (String) gamesTable.getValueAt(selectedRow, 2);
+                finishGame(homeTeam, awayTeam);
+                refreshTable();
+            } else {
+                scoreView.showDialog("Please select the game to finish");
+            }
+        });
+    }
+
+    private void summaryBtnListener() {
+        scoreView.getSummaryButton().addActionListener(listener -> {
+            if(getSummaryByTotalScore().isEmpty()) {
+                scoreView.showDialog ("There are no games to show!");
+            } else {
+                summaryView = new SummaryBoardView();
+                loadSummaryData();
+            }
+        });
+    }
+
+    public void refreshTable() {
+        DefaultTableModel tableModel = (DefaultTableModel) scoreView.getGamesTable().getModel();
+        tableModel.setRowCount(0); //clear table
+        for (Game game : games) {
+            Object[] row = {game.getHomeTeam(), game.getHomeTeamScore(), game.getAwayTeam(), game.getAwayTeamScore()};
+            tableModel.addRow(row);
+        }
+    }
+
+    private void loadSummaryData() {
+        DefaultTableModel tableModel = (DefaultTableModel) summaryView.getSummaryTable().getModel();
+        tableModel.setRowCount(0); //clear table
+        for (Game game : getSummaryByTotalScore()) {
+            Object[] row = {game.getHomeTeam(), game.getHomeTeamScore(), game.getAwayTeam(), game.getAwayTeamScore()};
+            tableModel.addRow(row);
+        }
+    }
+
 
 }

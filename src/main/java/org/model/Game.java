@@ -62,6 +62,13 @@ public class Game {
         return homeTeam.equalsIgnoreCase(other.homeTeam) && awayTeam.equalsIgnoreCase(other.awayTeam);
     }
 
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + homeTeam.toLowerCase().hashCode();
+        result = 31 * result + awayTeam.toLowerCase().hashCode();
+        return result;
+    }
 
     @Override
     public String toString() {

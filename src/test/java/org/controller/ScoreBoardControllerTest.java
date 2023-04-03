@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ScoreBoardControllerTest {
+class ScoreBoardControllerTest {
     ScoreBoardController scoreboard;
 
     @BeforeEach
@@ -36,9 +36,8 @@ public class ScoreBoardControllerTest {
     @Test
     void testFinishGame() {
         scoreboard.startGame("HomeTeam", "AwayTeam");
-        scoreboard.finishGame("HomeTeam", "AwayTeam");
-        List<Game> games = scoreboard.getSummaryByTotalScore();
-        assertTrue(games.isEmpty());
+        boolean result = scoreboard.finishGame("HomeTeam", "AwayTeam");
+        assertTrue(result);
     }
 
     @Test
@@ -52,7 +51,7 @@ public class ScoreBoardControllerTest {
         scoreboard.startGame("HomeTeam", "AwayTeam");
         List<Game> games = scoreboard.getSummaryByTotalScore();
         Game game = games.get(0);
-        scoreboard.updateScore(game, 1, 0);
+        scoreboard.updateScore("HomeTeam", "AwayTeam", 1, 0);
         assertEquals(1, game.getHomeTeamScore());
         assertEquals(0, game.getAwayTeamScore());
     }
@@ -61,23 +60,23 @@ public class ScoreBoardControllerTest {
     void testGetSummaryByTotalScore() {
         Game game1 = new Game("Mexico", "Canada");
         scoreboard.startGame(game1.getHomeTeam(), game1.getAwayTeam());
-        scoreboard.updateScore(game1, 0, 5);
+        scoreboard.updateScore(game1.getHomeTeam(), game1.getAwayTeam(), 0, 5);
 
         Game game2 = new Game("Spain", "Brazil");
         scoreboard.startGame(game2.getHomeTeam(), game2.getAwayTeam());
-        scoreboard.updateScore(game2, 10, 2);
+        scoreboard.updateScore(game2.getHomeTeam(), game2.getAwayTeam(), 10, 2);
 
         Game game3 = new Game("Germany", "France");
         scoreboard.startGame(game3.getHomeTeam(), game3.getAwayTeam());
-        scoreboard.updateScore(game3, 2, 2);
+        scoreboard.updateScore(game3.getHomeTeam(), game3.getAwayTeam(), 2, 2);
 
         Game game4 = new Game("Uruguay", "Italy");
         scoreboard.startGame(game4.getHomeTeam(), game4.getAwayTeam());
-        scoreboard.updateScore(game4, 6, 6);
+        scoreboard.updateScore(game4.getHomeTeam(), game4.getAwayTeam(), 6, 6);
 
         Game game5 = new Game("Argentina", "Australia");
         scoreboard.startGame(game5.getHomeTeam(), game5.getAwayTeam());
-        scoreboard.updateScore(game5, 3, 1);
+        scoreboard.updateScore(game5.getHomeTeam(), game5.getAwayTeam(), 3, 1);
 
         List<Game> sortedGames = scoreboard.getSummaryByTotalScore();
         sortedGames.forEach(System.out::println);

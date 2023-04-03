@@ -1,21 +1,16 @@
 package org.view;
 
-import org.controller.ScoreBoardController;
-import org.model.Game;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class SummaryBoardView extends JFrame {
-    private final ScoreBoardController controller;
     private JTable summaryTable;
     private JScrollPane scrollPane;
     private JPanel btnPanel;
     private JButton backButton;
 
-    public SummaryBoardView(ScoreBoardController controller) {
-        this.controller = controller;
+    public SummaryBoardView() {
         initComponents();
     }
 
@@ -26,7 +21,6 @@ public class SummaryBoardView extends JFrame {
         createTable();
         createBtnPanel();
         contentPane();
-        loadData();
     }
 
     private void createTable() {
@@ -55,20 +49,14 @@ public class SummaryBoardView extends JFrame {
         setVisible(true);
     }
 
-
-    private void loadData() {
-        DefaultTableModel tableModel = (DefaultTableModel) summaryTable.getModel();
-        tableModel.setRowCount(0); //clear table
-        for (Game game : controller.getSummaryByTotalScore()) {
-            Object[] row = {game.getHomeTeam(), game.getHomeTeamScore(), game.getAwayTeam(), game.getAwayTeamScore()};
-            tableModel.addRow(row);
-        }
+    private void backBtnListener() {
+        backButton.addActionListener(listener ->
+            dispose()
+        );
     }
 
-    private void backBtnListener() {
-        backButton.addActionListener(listener -> {
-            dispose();
-        });
+    public JTable getSummaryTable() {
+        return summaryTable;
     }
 
 }

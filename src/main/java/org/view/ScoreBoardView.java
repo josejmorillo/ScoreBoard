@@ -1,15 +1,11 @@
 package org.view;
 
-import org.controller.ScoreBoardController;
-import org.model.Game;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class ScoreBoardView extends JFrame {
 
-    private final ScoreBoardController controller;
     private JTable gamesTable;
 
     //Fields
@@ -31,8 +27,7 @@ public class ScoreBoardView extends JFrame {
     private JLabel awayScoreLabel;
     private JScrollPane scrollPane;
 
-    public ScoreBoardView(ScoreBoardController controller) {
-        this.controller = controller;
+    public ScoreBoardView() {
         initComponents();
     }
 
@@ -76,10 +71,6 @@ public class ScoreBoardView extends JFrame {
         updateButton = new JButton("Update Score");
         finishButton = new JButton("Finish Game");
         summaryButton = new JButton("Games Summary");
-        addBtnListener();
-        updateBtnListener();
-        finishBtnListener();
-        summaryBtnListener();
     }
 
     private void createLabels() {
@@ -103,93 +94,75 @@ public class ScoreBoardView extends JFrame {
         scrollPane = new JScrollPane(gamesTable);
     }
 
-    private void summaryBtnListener() {
-        summaryButton.addActionListener(listener -> {
-            summaryTable();
-        });
-    }
-
-    private void finishBtnListener() {
-        finishButton.addActionListener(listener -> {
-            int selectedRow = gamesTable.getSelectedRow();
-            if (selectedRow >= 0) {
-                String homeTeam = (String) gamesTable.getValueAt(selectedRow, 0);
-                String awayTeam = (String) gamesTable.getValueAt(selectedRow, 2);
-                controller.finishGame(homeTeam, awayTeam);
-                refreshTable();
-            } else {
-                showDialog("Please select the game to finish");
-            }
-        });
-    }
-
-    private void addBtnListener() {
-        addButton.addActionListener(listener -> {
-            String homeTeam = homeTeamField.getText();
-            String awayTeam = awayTeamField.getText();
-            if(!homeTeam.isEmpty() && !awayTeam.isEmpty()) {
-                controller.startGame(homeTeam, awayTeam);
-                resetAddBtn();
-                refreshTable();
-            } else {
-                showDialog("Please fill in both team fields");
-            }
-        });
-    }
-
-    private void resetAddBtn() {
+    public void resetAddBtn() {
         homeTeamField.setText("");
         awayTeamField.setText("");
     }
 
-    private void updateBtnListener() {
-        updateButton.addActionListener(listener -> {
-            int selectedRow = gamesTable.getSelectedRow();
-            if (selectedRow >= 0) {
-                String homeTeam = (String) gamesTable.getValueAt(selectedRow, 0);
-                String awayTeam = (String) gamesTable.getValueAt(selectedRow, 2);
-                int homeScore;
-                int awayScore;
-                try {
-                    homeScore = Integer.parseInt(homeScoreField.getText());
-                    awayScore = Integer.parseInt(awayScoreField.getText());
-                } catch (NumberFormatException e) {
-                    showDialog("Please enter valid scores");
-                    return;
-                }
-                controller.updateScore(homeTeam, awayTeam, homeScore, awayScore);
-                resetUpdateBtn();
-                refreshTable();
-            } else {
-                showDialog("Please select a game to update the score");
-            }
-        });
-    }
-
-    private void resetUpdateBtn() {
+    public void resetUpdateBtn() {
         homeScoreField.setText("");
         awayScoreField.setText("");
     }
 
-    private void showDialog(String msg) {
+    public void showDialog(String msg) {
         JOptionPane.showMessageDialog(null, msg, "Alert", JOptionPane.WARNING_MESSAGE);
     }
 
-    private void refreshTable() {
-        DefaultTableModel tableModel = (DefaultTableModel) gamesTable.getModel();
-        tableModel.setRowCount(0); //clear table
-        for (Game game : controller.getGames()) {
-            Object[] row = {game.getHomeTeam(), game.getHomeTeamScore(), game.getAwayTeam(), game.getAwayTeamScore()};
-            tableModel.addRow(row);
-        }
+    public JTable getGamesTable() {
+        return gamesTable;
     }
 
-    private void summaryTable() {
-        if(controller.getSummaryByTotalScore().isEmpty()) {
-            showDialog ("There are no games to show!");
-        } else {
-            SummaryBoardView summaryView = new SummaryBoardView(controller);
-        }
+    public JTextField getHomeTeamField() {
+        return homeTeamField;
     }
+
+    public JTextField getAwayTeamField() {
+        return awayTeamField;
+    }
+
+    public JTextField getHomeScoreField() {
+        return homeScoreField;
+    }
+
+    public JTextField getAwayScoreField() {
+        return awayScoreField;
+    }
+
+    public JButton getUpdateButton() {
+        return updateButton;
+    }
+
+    public JButton getFinishButton() {
+        return finishButton;
+    }
+
+    public JButton getSummaryButton() {
+        return summaryButton;
+    }
+
+    public JButton getAddButton() {
+        return addButton;
+    }
+
+    public JLabel getAwayTeamLabel() {
+        return awayTeamLabel;
+    }
+
+    public JLabel getHomeTeamLabel() {
+        return homeTeamLabel;
+    }
+
+    public JLabel getHomeScoreLabel() {
+        return homeScoreLabel;
+    }
+
+    public JLabel getAwayScoreLabel() {
+        return awayScoreLabel;
+    }
+
+    public JScrollPane getScrollPane() {
+        return scrollPane;
+    }
+
 
 }
